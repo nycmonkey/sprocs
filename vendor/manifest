@@ -1,0 +1,42 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/antlr/antlr4/runtime/Go/antlr",
+			"repository": "https://github.com/antlr/antlr4",
+			"revision": "a17b299cd35c5133f05077c6efb8fdf439df5cf2",
+			"branch": "master",
+			"path": "/runtime/Go/antlr",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/denisenkom/go-mssqldb",
+			"repository": "https://github.com/denisenkom/go-mssqldb",
+			"revision": "370263e74ba8f78a6a3fa15202e934f1be4eccd4",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-runewidth",
+			"repository": "https://github.com/mattn/go-runewidth",
+			"revision": "737072b4e32b7a5018b4a7125da8d12de90e8045",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "60c41d1de8da134c05b7b40154a9a82bf5b7edb9",
+			"branch": "master",
+			"path": "/context",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/cheggaaa/pb.v1",
+			"repository": "https://gopkg.in/cheggaaa/pb.v1",
+			"revision": "d7e6ca3010b6f084d8056847f55d7f572f180678",
+			"branch": "master",
+			"notests": true
+		}
+	]
+}
