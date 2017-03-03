@@ -3,7 +3,7 @@ Analyze TSQL stored procedures
 
 ## Background
 
-This app extracts the source tables used by stored procuedures in a particular database.  You probably don't have access to the network or database in question, but you might pull some ideas from the appoach.
+This app extracts the source tables used by stored procedures in a particular database.  You probably don't have access to the network or database in question, but you might pull some ideas from the appoach.
 
 * The app parses the stored procedure syntax, assumed to be written in T-SQL
 * [Antlr](http://www.antlr.org) was used to generate the parser from [this grammar file](https://github.com/antlr/grammars-v4/blob/master/tsql/tsql.g4)
