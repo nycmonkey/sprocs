@@ -132,6 +132,7 @@ func main() {
 	close(errCh)
 	<-tablesHandled
 	<-errorsHandled
+	<-portfoliosHandled
 	bar.FinishPrint("All sprocs parsed")
 }
 
@@ -170,16 +171,20 @@ func getSprocs(defDir string, outCh chan<- keyValue) error {
 		if err != nil {
 			return err
 		}
-		var psn, gusn, rsn, csn, asn, pc sql.NullString
+		var psn, gusn, rsn, csn, asn sql.NullString
+		var pc sql.NullInt64
 		for rows.Next() {
 			if err = rows.Scan(&psn, &gusn, &rsn, &csn, &asn, &pc); err != nil {
 				rows.Close()
 				return err
 			}
-			for _, code := range []sql.NullString{psn, gusn, rsn, csn, asn, pc} {
+			for _, code := range []sql.NullString{psn, gusn, rsn, csn, asn} {
 				if code.Valid {
 					portfolioKeys[code.String] = true
 				}
+			}
+			if pc.Valid {
+				portfolioKeys[fmt.Sprintf("%d", pc.Int64)] = true
 			}
 		}
 		rows.Close()
@@ -380,7 +385,7 @@ func parseSproc(sproc keyValue) (errors, tables []string, portfolios []string) {
 	pCh := make(chan string)
 	eCh := make(chan keyValue)
 	wg := new(sync.WaitGroup)
-	wg.Add(2)
+	wg.Add(3)
 	go func(ch <-chan keyValue) {
 		for err := range ch {
 			errors = append(errors, err.value)
