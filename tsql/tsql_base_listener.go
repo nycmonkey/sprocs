@@ -129,6 +129,12 @@ func (s *BasetsqlListener) EnterRaiseerror_statement(ctx *Raiseerror_statementCo
 // ExitRaiseerror_statement is called when production raiseerror_statement is exited.
 func (s *BasetsqlListener) ExitRaiseerror_statement(ctx *Raiseerror_statementContext) {}
 
+// EnterEmpty_statement is called when production empty_statement is entered.
+func (s *BasetsqlListener) EnterEmpty_statement(ctx *Empty_statementContext) {}
+
+// ExitEmpty_statement is called when production empty_statement is exited.
+func (s *BasetsqlListener) ExitEmpty_statement(ctx *Empty_statementContext) {}
+
 // EnterAnother_statement is called when production another_statement is entered.
 func (s *BasetsqlListener) EnterAnother_statement(ctx *Another_statementContext) {}
 
@@ -201,11 +207,35 @@ func (s *BasetsqlListener) EnterCreate_index(ctx *Create_indexContext) {}
 // ExitCreate_index is called when production create_index is exited.
 func (s *BasetsqlListener) ExitCreate_index(ctx *Create_indexContext) {}
 
-// EnterCreate_procedure is called when production create_procedure is entered.
-func (s *BasetsqlListener) EnterCreate_procedure(ctx *Create_procedureContext) {}
+// EnterCreate_or_alter_procedure is called when production create_or_alter_procedure is entered.
+func (s *BasetsqlListener) EnterCreate_or_alter_procedure(ctx *Create_or_alter_procedureContext) {}
 
-// ExitCreate_procedure is called when production create_procedure is exited.
-func (s *BasetsqlListener) ExitCreate_procedure(ctx *Create_procedureContext) {}
+// ExitCreate_or_alter_procedure is called when production create_or_alter_procedure is exited.
+func (s *BasetsqlListener) ExitCreate_or_alter_procedure(ctx *Create_or_alter_procedureContext) {}
+
+// EnterCreate_or_alter_function is called when production create_or_alter_function is entered.
+func (s *BasetsqlListener) EnterCreate_or_alter_function(ctx *Create_or_alter_functionContext) {}
+
+// ExitCreate_or_alter_function is called when production create_or_alter_function is exited.
+func (s *BasetsqlListener) ExitCreate_or_alter_function(ctx *Create_or_alter_functionContext) {}
+
+// EnterFunc_body_returns_select is called when production func_body_returns_select is entered.
+func (s *BasetsqlListener) EnterFunc_body_returns_select(ctx *Func_body_returns_selectContext) {}
+
+// ExitFunc_body_returns_select is called when production func_body_returns_select is exited.
+func (s *BasetsqlListener) ExitFunc_body_returns_select(ctx *Func_body_returns_selectContext) {}
+
+// EnterFunc_body_returns_table is called when production func_body_returns_table is entered.
+func (s *BasetsqlListener) EnterFunc_body_returns_table(ctx *Func_body_returns_tableContext) {}
+
+// ExitFunc_body_returns_table is called when production func_body_returns_table is exited.
+func (s *BasetsqlListener) ExitFunc_body_returns_table(ctx *Func_body_returns_tableContext) {}
+
+// EnterFunc_body_returns_scalar is called when production func_body_returns_scalar is entered.
+func (s *BasetsqlListener) EnterFunc_body_returns_scalar(ctx *Func_body_returns_scalarContext) {}
+
+// ExitFunc_body_returns_scalar is called when production func_body_returns_scalar is exited.
+func (s *BasetsqlListener) ExitFunc_body_returns_scalar(ctx *Func_body_returns_scalarContext) {}
 
 // EnterProcedure_param is called when production procedure_param is entered.
 func (s *BasetsqlListener) EnterProcedure_param(ctx *Procedure_paramContext) {}
@@ -218,6 +248,12 @@ func (s *BasetsqlListener) EnterProcedure_option(ctx *Procedure_optionContext) {
 
 // ExitProcedure_option is called when production procedure_option is exited.
 func (s *BasetsqlListener) ExitProcedure_option(ctx *Procedure_optionContext) {}
+
+// EnterFunction_option is called when production function_option is entered.
+func (s *BasetsqlListener) EnterFunction_option(ctx *Function_optionContext) {}
+
+// ExitFunction_option is called when production function_option is exited.
+func (s *BasetsqlListener) ExitFunction_option(ctx *Function_optionContext) {}
 
 // EnterCreate_statistics is called when production create_statistics is entered.
 func (s *BasetsqlListener) EnterCreate_statistics(ctx *Create_statisticsContext) {}
@@ -397,6 +433,12 @@ func (s *BasetsqlListener) EnterDrop_procedure(ctx *Drop_procedureContext) {}
 // ExitDrop_procedure is called when production drop_procedure is exited.
 func (s *BasetsqlListener) ExitDrop_procedure(ctx *Drop_procedureContext) {}
 
+// EnterDrop_function is called when production drop_function is entered.
+func (s *BasetsqlListener) EnterDrop_function(ctx *Drop_functionContext) {}
+
+// ExitDrop_function is called when production drop_function is exited.
+func (s *BasetsqlListener) ExitDrop_function(ctx *Drop_functionContext) {}
+
 // EnterDrop_statistics is called when production drop_statistics is entered.
 func (s *BasetsqlListener) EnterDrop_statistics(ctx *Drop_statisticsContext) {}
 
@@ -510,6 +552,18 @@ func (s *BasetsqlListener) EnterUse_statement(ctx *Use_statementContext) {}
 
 // ExitUse_statement is called when production use_statement is exited.
 func (s *BasetsqlListener) ExitUse_statement(ctx *Use_statementContext) {}
+
+// EnterDbcc_clause is called when production dbcc_clause is entered.
+func (s *BasetsqlListener) EnterDbcc_clause(ctx *Dbcc_clauseContext) {}
+
+// ExitDbcc_clause is called when production dbcc_clause is exited.
+func (s *BasetsqlListener) ExitDbcc_clause(ctx *Dbcc_clauseContext) {}
+
+// EnterDbcc_options is called when production dbcc_options is entered.
+func (s *BasetsqlListener) EnterDbcc_options(ctx *Dbcc_optionsContext) {}
+
+// ExitDbcc_options is called when production dbcc_options is exited.
+func (s *BasetsqlListener) ExitDbcc_options(ctx *Dbcc_optionsContext) {}
 
 // EnterExecute_clause is called when production execute_clause is entered.
 func (s *BasetsqlListener) EnterExecute_clause(ctx *Execute_clauseContext) {}
@@ -734,6 +788,24 @@ func (s *BasetsqlListener) EnterQuery_specification(ctx *Query_specificationCont
 
 // ExitQuery_specification is called when production query_specification is exited.
 func (s *BasetsqlListener) ExitQuery_specification(ctx *Query_specificationContext) {}
+
+// EnterTop_clause is called when production top_clause is entered.
+func (s *BasetsqlListener) EnterTop_clause(ctx *Top_clauseContext) {}
+
+// ExitTop_clause is called when production top_clause is exited.
+func (s *BasetsqlListener) ExitTop_clause(ctx *Top_clauseContext) {}
+
+// EnterTop_percent is called when production top_percent is entered.
+func (s *BasetsqlListener) EnterTop_percent(ctx *Top_percentContext) {}
+
+// ExitTop_percent is called when production top_percent is exited.
+func (s *BasetsqlListener) ExitTop_percent(ctx *Top_percentContext) {}
+
+// EnterTop_count is called when production top_count is entered.
+func (s *BasetsqlListener) EnterTop_count(ctx *Top_countContext) {}
+
+// ExitTop_count is called when production top_count is exited.
+func (s *BasetsqlListener) ExitTop_count(ctx *Top_countContext) {}
 
 // EnterOrder_by_clause is called when production order_by_clause is entered.
 func (s *BasetsqlListener) EnterOrder_by_clause(ctx *Order_by_clauseContext) {}

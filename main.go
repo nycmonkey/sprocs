@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -24,11 +25,10 @@ import (
 var (
 	dbHost       string
 	bar          *pb.ProgressBar
+	faster       bool
 	activeSprocQ = `
 SELECT ResultsStoredProc
 FROM [BRS].[dbo].[BRS_ConfigDrivenETLs]
-WHERE Active = 1
-AND ResultsStoredProc LIKE 'gsp_cfgetl_%'
 ORDER BY ResultsStoredProc ASC
 `
 	sprocQ = `
@@ -94,6 +94,7 @@ type errorListener struct {
 
 func init() {
 	flag.StringVar(&dbHost, "host", "IL1TSTSQL10", "sproc database host server name")
+	flag.BoolVar(&faster, "fast", false, "use a faster but less error-tolerant parsing strategy")
 	whitelist = make(map[string]bool)
 	portfolioKeys = make(map[string]bool)
 }
@@ -108,12 +109,12 @@ func main() {
 	}
 	log.Println("Writing output to", outDir)
 	sprocCh := make(chan keyValue)
-	tablesCh := make(chan []string, 10)
-	portfoliosCh := make(chan []string, 10)
+	tablesCh := make(chan []string, 1)
+	portfoliosCh := make(chan []string, 1)
 	tablesHandled := make(chan bool)
 	portfoliosHandled := make(chan bool)
 	errorsHandled := make(chan bool)
-	errCh := make(chan []string, 10)
+	errCh := make(chan []string, 1)
 	go handleTables(tablesCh, tablesHandled)
 	go handlePortfolios(portfoliosCh, portfoliosHandled)
 	go handleErrors(errCh, errorsHandled)
@@ -130,6 +131,7 @@ func main() {
 	wg.Wait() // this can take a while
 	close(tablesCh)
 	close(errCh)
+	close(portfoliosCh)
 	<-tablesHandled
 	<-errorsHandled
 	<-portfoliosHandled
@@ -200,12 +202,14 @@ func getSprocs(defDir string, outCh chan<- keyValue) error {
 	defer rows.Close()
 	var sprocNames []string
 	for rows.Next() {
-		var sprocName string
+		var sprocName sql.NullString
 		if err = rows.Scan(&sprocName); err != nil {
 			rows.Close()
 			return err
 		}
-		sprocNames = append(sprocNames, sprocName)
+		if sprocName.Valid {
+			sprocNames = append(sprocNames, sprocName.String)
+		}
 	}
 	rows.Close()
 	log.Println("Found", len(sprocNames), "active stored procedures")
@@ -298,9 +302,13 @@ func handleErrors(ch <-chan []string, done chan<- bool) {
 	defer f.Close()
 	w := csv.NewWriter(f)
 	w.UseCRLF = true
-	w.Write([]string{"Stored Procedure", "Error"})
+	w.Write([]string{"Stored Procedure", "Error Count"})
+	counts := make(map[string]int)
 	for row := range ch {
-		w.Write(row)
+		counts[row[0]]++
+	}
+	for proc, count := range counts {
+		w.Write([]string{proc, strconv.Itoa(count)})
 	}
 	w.Flush()
 	done <- true
@@ -412,10 +420,11 @@ func parseSproc(sproc keyValue) (errors, tables []string, portfolios []string) {
 	errL := newErrorListener(eCh, sproc.key)
 	p.AddErrorListener(errL)
 	p.BuildParseTrees = true
-	// p.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
+	if faster {
+		p.GetInterpreter().SetPredictionMode(antlr.PredictionModeSLL)
+	}
 	tree := p.Tsql_file()
-	l := NewTreeShapeListener(tCh, pCh)
-	antlr.ParseTreeWalkerDefault.Walk(l, tree)
+	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(tCh, pCh), tree)
 	close(tCh)
 	close(pCh)
 	close(eCh)
@@ -443,27 +452,6 @@ func NewTreeShapeListener(tablesCh, portfoliosCh chan<- string) *TreeShapeListen
 	}
 }
 
-// EnterCreate_procedure is called when the parser enters a `create_procedure` node
-func (l *TreeShapeListener) EnterCreate_procedure(ctx *parser.Create_procedureContext) {
-	l.inProcDef = true
-}
-
-// ExitCreate_procedure is called when the parser exits a `create_procedure` node
-func (l *TreeShapeListener) ExitCreate_procedure(ctx *parser.Create_procedureContext) {
-	l.inProcDef = false
-}
-
-// EnterFunc_proc_name is called when the parser enters a `func_proc_name` node,
-// which includes the name of the stored procedure being defined
-func (l *TreeShapeListener) EnterFunc_proc_name(ctx *parser.Func_proc_nameContext) {
-	if l.inProcDef {
-		t := ctx.GetText()
-		if strings.Contains(t, "gsp_cfgetl") {
-			l.info.Name = t
-		}
-	}
-}
-
 // EnterTable_name is called when the parser enters a `table_name` node,
 // which includes the name of the table from whcih data is sourced
 func (l *TreeShapeListener) EnterTable_name(ctx *parser.Table_nameContext) {
@@ -484,8 +472,28 @@ func (l *TreeShapeListener) EnterSimple_id(ctx *parser.Simple_idContext) {
 // EnterConstant is called when the parser enters a `simple_id` node
 func (l *TreeShapeListener) EnterConstant(ctx *parser.ConstantContext) {
 	id := strings.TrimSpace(ctx.GetText())
+	id = strings.TrimPrefix(id, `'`)
+	id = strings.TrimSuffix(id, `'`)
 	if portfolioKeys[id] {
 		l.info.Portfolios[id] = true
+	}
+	// handle suffix wildcards
+	if strings.HasSuffix(id, "%") {
+		id = strings.TrimSuffix(id, "%")
+		for k := range portfolioKeys {
+			if strings.HasPrefix(k, id) {
+				l.info.Portfolios[k] = true
+			}
+		}
+	}
+	// handle prefix wildcards
+	if strings.HasPrefix(id, "%") {
+		id = strings.TrimPrefix(id, "%")
+		for k := range portfolioKeys {
+			if strings.HasSuffix(k, id) {
+				l.info.Portfolios[k] = true
+			}
+		}
 	}
 }
 

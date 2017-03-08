@@ -62,6 +62,9 @@ type tsqlListener interface {
 	// EnterRaiseerror_statement is called when entering the raiseerror_statement production.
 	EnterRaiseerror_statement(c *Raiseerror_statementContext)
 
+	// EnterEmpty_statement is called when entering the empty_statement production.
+	EnterEmpty_statement(c *Empty_statementContext)
+
 	// EnterAnother_statement is called when entering the another_statement production.
 	EnterAnother_statement(c *Another_statementContext)
 
@@ -98,14 +101,29 @@ type tsqlListener interface {
 	// EnterCreate_index is called when entering the create_index production.
 	EnterCreate_index(c *Create_indexContext)
 
-	// EnterCreate_procedure is called when entering the create_procedure production.
-	EnterCreate_procedure(c *Create_procedureContext)
+	// EnterCreate_or_alter_procedure is called when entering the create_or_alter_procedure production.
+	EnterCreate_or_alter_procedure(c *Create_or_alter_procedureContext)
+
+	// EnterCreate_or_alter_function is called when entering the create_or_alter_function production.
+	EnterCreate_or_alter_function(c *Create_or_alter_functionContext)
+
+	// EnterFunc_body_returns_select is called when entering the func_body_returns_select production.
+	EnterFunc_body_returns_select(c *Func_body_returns_selectContext)
+
+	// EnterFunc_body_returns_table is called when entering the func_body_returns_table production.
+	EnterFunc_body_returns_table(c *Func_body_returns_tableContext)
+
+	// EnterFunc_body_returns_scalar is called when entering the func_body_returns_scalar production.
+	EnterFunc_body_returns_scalar(c *Func_body_returns_scalarContext)
 
 	// EnterProcedure_param is called when entering the procedure_param production.
 	EnterProcedure_param(c *Procedure_paramContext)
 
 	// EnterProcedure_option is called when entering the procedure_option production.
 	EnterProcedure_option(c *Procedure_optionContext)
+
+	// EnterFunction_option is called when entering the function_option production.
+	EnterFunction_option(c *Function_optionContext)
 
 	// EnterCreate_statistics is called when entering the create_statistics production.
 	EnterCreate_statistics(c *Create_statisticsContext)
@@ -194,6 +212,9 @@ type tsqlListener interface {
 	// EnterDrop_procedure is called when entering the drop_procedure production.
 	EnterDrop_procedure(c *Drop_procedureContext)
 
+	// EnterDrop_function is called when entering the drop_function production.
+	EnterDrop_function(c *Drop_functionContext)
+
 	// EnterDrop_statistics is called when entering the drop_statistics production.
 	EnterDrop_statistics(c *Drop_statisticsContext)
 
@@ -250,6 +271,12 @@ type tsqlListener interface {
 
 	// EnterUse_statement is called when entering the use_statement production.
 	EnterUse_statement(c *Use_statementContext)
+
+	// EnterDbcc_clause is called when entering the dbcc_clause production.
+	EnterDbcc_clause(c *Dbcc_clauseContext)
+
+	// EnterDbcc_options is called when entering the dbcc_options production.
+	EnterDbcc_options(c *Dbcc_optionsContext)
 
 	// EnterExecute_clause is called when entering the execute_clause production.
 	EnterExecute_clause(c *Execute_clauseContext)
@@ -361,6 +388,15 @@ type tsqlListener interface {
 
 	// EnterQuery_specification is called when entering the query_specification production.
 	EnterQuery_specification(c *Query_specificationContext)
+
+	// EnterTop_clause is called when entering the top_clause production.
+	EnterTop_clause(c *Top_clauseContext)
+
+	// EnterTop_percent is called when entering the top_percent production.
+	EnterTop_percent(c *Top_percentContext)
+
+	// EnterTop_count is called when entering the top_count production.
+	EnterTop_count(c *Top_countContext)
 
 	// EnterOrder_by_clause is called when entering the order_by_clause production.
 	EnterOrder_by_clause(c *Order_by_clauseContext)
@@ -620,6 +656,9 @@ type tsqlListener interface {
 	// ExitRaiseerror_statement is called when exiting the raiseerror_statement production.
 	ExitRaiseerror_statement(c *Raiseerror_statementContext)
 
+	// ExitEmpty_statement is called when exiting the empty_statement production.
+	ExitEmpty_statement(c *Empty_statementContext)
+
 	// ExitAnother_statement is called when exiting the another_statement production.
 	ExitAnother_statement(c *Another_statementContext)
 
@@ -656,14 +695,29 @@ type tsqlListener interface {
 	// ExitCreate_index is called when exiting the create_index production.
 	ExitCreate_index(c *Create_indexContext)
 
-	// ExitCreate_procedure is called when exiting the create_procedure production.
-	ExitCreate_procedure(c *Create_procedureContext)
+	// ExitCreate_or_alter_procedure is called when exiting the create_or_alter_procedure production.
+	ExitCreate_or_alter_procedure(c *Create_or_alter_procedureContext)
+
+	// ExitCreate_or_alter_function is called when exiting the create_or_alter_function production.
+	ExitCreate_or_alter_function(c *Create_or_alter_functionContext)
+
+	// ExitFunc_body_returns_select is called when exiting the func_body_returns_select production.
+	ExitFunc_body_returns_select(c *Func_body_returns_selectContext)
+
+	// ExitFunc_body_returns_table is called when exiting the func_body_returns_table production.
+	ExitFunc_body_returns_table(c *Func_body_returns_tableContext)
+
+	// ExitFunc_body_returns_scalar is called when exiting the func_body_returns_scalar production.
+	ExitFunc_body_returns_scalar(c *Func_body_returns_scalarContext)
 
 	// ExitProcedure_param is called when exiting the procedure_param production.
 	ExitProcedure_param(c *Procedure_paramContext)
 
 	// ExitProcedure_option is called when exiting the procedure_option production.
 	ExitProcedure_option(c *Procedure_optionContext)
+
+	// ExitFunction_option is called when exiting the function_option production.
+	ExitFunction_option(c *Function_optionContext)
 
 	// ExitCreate_statistics is called when exiting the create_statistics production.
 	ExitCreate_statistics(c *Create_statisticsContext)
@@ -752,6 +806,9 @@ type tsqlListener interface {
 	// ExitDrop_procedure is called when exiting the drop_procedure production.
 	ExitDrop_procedure(c *Drop_procedureContext)
 
+	// ExitDrop_function is called when exiting the drop_function production.
+	ExitDrop_function(c *Drop_functionContext)
+
 	// ExitDrop_statistics is called when exiting the drop_statistics production.
 	ExitDrop_statistics(c *Drop_statisticsContext)
 
@@ -808,6 +865,12 @@ type tsqlListener interface {
 
 	// ExitUse_statement is called when exiting the use_statement production.
 	ExitUse_statement(c *Use_statementContext)
+
+	// ExitDbcc_clause is called when exiting the dbcc_clause production.
+	ExitDbcc_clause(c *Dbcc_clauseContext)
+
+	// ExitDbcc_options is called when exiting the dbcc_options production.
+	ExitDbcc_options(c *Dbcc_optionsContext)
 
 	// ExitExecute_clause is called when exiting the execute_clause production.
 	ExitExecute_clause(c *Execute_clauseContext)
@@ -919,6 +982,15 @@ type tsqlListener interface {
 
 	// ExitQuery_specification is called when exiting the query_specification production.
 	ExitQuery_specification(c *Query_specificationContext)
+
+	// ExitTop_clause is called when exiting the top_clause production.
+	ExitTop_clause(c *Top_clauseContext)
+
+	// ExitTop_percent is called when exiting the top_percent production.
+	ExitTop_percent(c *Top_percentContext)
+
+	// ExitTop_count is called when exiting the top_count production.
+	ExitTop_count(c *Top_countContext)
 
 	// ExitOrder_by_clause is called when exiting the order_by_clause production.
 	ExitOrder_by_clause(c *Order_by_clauseContext)
