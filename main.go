@@ -27,9 +27,9 @@ var (
 	bar          *pb.ProgressBar
 	faster       bool
 	activeSprocQ = `
-SELECT ResultsStoredProc
-FROM [BRS].[dbo].[BRS_ConfigDrivenETLs]
-ORDER BY ResultsStoredProc ASC
+select ROUTINE_NAME from BRS.information_schema.routines 
+where routine_type = 'PROCEDURE' 
+and Left(Routine_Name, 3) NOT IN ('sp_', 'xp_', 'ms_')
 `
 	sprocQ = `
 SELECT OBJECT_DEFINITION (OBJECT_ID(?))
@@ -230,7 +230,7 @@ func getSprocs(defDir string, outCh chan<- keyValue) error {
 		}
 		validIndices = append(validIndices, i)
 		var f *os.File
-		f, err = os.Create(filepath.Join(defDir, sn+".sql"))
+		f, err = os.Create(filepath.Join(defDir, strings.Replace(sn, "/", "_", -1)+".sql"))
 		if err != nil {
 			return err
 		}
@@ -253,7 +253,7 @@ func getSprocs(defDir string, outCh chan<- keyValue) error {
 
 	for _, i := range validIndices {
 		var def []byte
-		def, err = ioutil.ReadFile(filepath.Join(defDir, sprocNames[i]+".sql"))
+		def, err = ioutil.ReadFile(filepath.Join(defDir, strings.Replace(sprocNames[i], "/", "_", -1)+".sql"))
 		if err != nil {
 			return err
 		}
@@ -316,15 +316,6 @@ func handleErrors(ch <-chan []string, done chan<- bool) {
 
 func handleSprocDetails(defDir string, inCh <-chan keyValue, outCh chan<- []string, pCh chan<- []string, errCh chan<- []string, done *sync.WaitGroup) {
 	for s := range inCh {
-		f, err := os.Create(filepath.Join(defDir, s.key+".sql"))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		_, err = f.WriteString(s.value)
-		f.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
 		errors, tables, portfolios := parseSproc(s)
 		for _, e := range errors {
 			errCh <- []string{s.key, e}
